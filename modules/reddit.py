@@ -10,6 +10,7 @@ http://inamidst.com/phenny/
 import re
 import web
 import json
+import sys
 
 def query(bits, n=1): 
    """Search using SearchMash, return its JSON."""
@@ -24,12 +25,20 @@ def query(bits, n=1):
 
 def top(subreddit): 
    results = query('r/' + subreddit)
-   if results['data']['children'][0]: 
-      top = results['data']['children'][0]['data']
-      if subreddit != 'all':
-         return "'%s' - +%d/-%d - http://redd.it/%s" % (top['title'], top['ups'], top['downs'], top['id'])
-      else:
-         return "'%s' - +%d/-%d in %s - http://redd.it/%s" % (top['title'], top['ups'], top['downs'], top['subreddit'], top['id'])
+   try:
+      if results['data']['children'][0]: 
+         top = results['data']['children'][0]['data']
+         #currently broken as reddit returns emtpy json children if nsfw. todo: write auth bit
+	 nsfwtext = "(NSFW)" if top['over_18'] == "true" else ""
+         if subreddit != 'all':
+            return "/r/%s '%s' +%d/-%d http://redd.it/%s %s" % (top['subreddit'], top['title'], top['ups'], top['downs'], top['id'], nsfwtext)
+         else:
+            return "'%s' - +%d/-%d in %s - http://redd.it/%s" % (top['title'], top['ups'], top['downs'], top['subreddit'], top['id'])
+      return "Something went badwrong"
+   except Exception, err:
+         print >> sys.stderr, "Error in .reddit:"
+         print >> sys.stderr,str(err)
+         return "That subreddit doesn't exist. L2reddit!"
    return None
 
 def link(id):
@@ -40,6 +49,7 @@ def link(id):
    return None
 
 def reddit(phenny, input): 
+   print >> sys.stderr, "Running reddit /r/ on: " + str(input)
    """Queries Google for the specified input."""
    query = input.group(2)
    if not query: 
@@ -55,14 +65,14 @@ reddit.commands = ['reddit']
 reddit.priority = 'high'
 reddit.example = '.reddit minecraftau'
 
-uri_matcher = re.compile(r'http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/\w+/)?comments)/)(\w+)')
+uri_matcher = re.compile(r'http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)')
 def reddit_linkage(bot, input): 
    matches = uri_matcher.search(input.group(1))
    if not matches:
       return
 
    bot.say(link(matches.group(1)))
-reddit_linkage.rule = r'(http://(?:www\.)?redd.*)'
+reddit_linkage.rule = r'.*(http://(?:www\.)?redd.*)'
 reddit_linkage.priority = 'low'
 
 if __name__ == '__main__': 

@@ -12,6 +12,7 @@ import urllib, urllib2
 import collections
 
 maximum = 2
+lastrun = 0
 people = collections.defaultdict(dict)
 
 def loadReminders(fn): 
@@ -68,7 +69,9 @@ def f_remind(phenny, input):
 
    if input.sender in people and tellee in people[input.sender]:
       print 'status of %s is %s' % (tellee, people[input.sender][tellee])
-   timenow = time.strftime('%d %b %H:%MZ', time.gmtime())
+#   timenow = time.strftime('%d %b %H:%MZ', time.gmtime())
+# alphabeat patched to local time
+   timenow = time.strftime('%d %b %H:%M', time.localtime())
    if not tellee in (teller.lower(), phenny.nick, 'me'): # @@
       # @@ <deltab> and year, if necessary
       warn = False
@@ -148,12 +151,14 @@ def message(phenny, input):
 message.rule = r'(.*)'
 message.priority = 'low'
 
+'''
 def pinged(bot, input):
    for channel in bot.channels:
       bot.write(('WHO', channel, '%cnf'))
 pinged.rule = r'(.*)'
 pinged.priority = 'low'
 pinged.event = 'PING'
+pinged.thread = False
 
 def who(phenny, input):
    me, channel, nick, status = input.args
@@ -161,6 +166,7 @@ def who(phenny, input):
 who.rule = r'(.*)'
 who.priority = 'low'
 who.event = '354'
+'''
 
 if __name__ == '__main__': 
    print __doc__.strip()

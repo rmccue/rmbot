@@ -10,6 +10,8 @@ http://inamidst.com/phenny/
 import sys, re, time, traceback
 import socket, asyncore, asynchat
 
+import select
+
 class Origin(object): 
    source = re.compile(r'([^!]*)!?([^@]*)@?(.*)')
 
@@ -26,7 +28,8 @@ class Origin(object):
 
 class Bot(asynchat.async_chat): 
    def __init__(self, nick, name, channels, password=None): 
-      asynchat.async_chat.__init__(self)
+      self.socketmap = {}
+      asynchat.async_chat.__init__(self, map=self.socketmap)
       self.set_terminator('\n')
       self.buffer = ''
 
@@ -42,13 +45,17 @@ class Bot(asynchat.async_chat):
       import threading
       self.sending = threading.RLock()
 
+   # def push(self, *args, **kargs): 
+   #    asynchat.async_chat.push(self, *args, **kargs)
+
    def __write(self, args, text=None): 
       # print '%r %r %r' % (self, args, text)
       try: 
          if text is not None: 
-            self.push(' '.join(args) + ' :' + text + '\r\n')
-         else: self.push(' '.join(args) + '\r\n')
+            self.push((' '.join(args) + ' :' + text)[:512] + '\r\n')
+         else: self.push(' '.join(args)[:512] + '\r\n')
       except IndexError: 
+         print >> sys.stderr, 'indexerror in __write'
          pass
 
    def write(self, args, text=None): 
@@ -62,7 +69,10 @@ class Bot(asynchat.async_chat):
          if text is not None: 
             text = safe(text)
          self.__write(args, text)
-      except Exception, e: pass
+      except Exception, e:
+         print >> sys.stderr, 'exception in write'
+         pass
+
 
    def run(self, host, port=6667): 
       self.initiate_connect(host, port)
@@ -73,7 +83,8 @@ class Bot(asynchat.async_chat):
          print >> sys.stderr, message,
       self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
       self.connect((host, port))
-      try: asyncore.loop()
+
+      try: asyncore.loop(timeout=0.05, use_poll=True, map=self.socketmap)
       except KeyboardInterrupt: 
          sys.exit()
 
@@ -88,6 +99,10 @@ class Bot(asynchat.async_chat):
    def handle_close(self): 
       self.close()
       print >> sys.stderr, 'Closed!'
+
+   def handle_expt(self):
+      self.close()
+      print >> sys.stderr, 'Expt! (whatever that means)'
 
    def collect_incoming_data(self, data): 
       self.buffer += data
@@ -148,7 +163,10 @@ class Bot(asynchat.async_chat):
             self.sending.release()
             return
 
-      self.__write(('PRIVMSG', recipient), text)
+      def safe(input): 
+         input = input.replace('\n', '')
+         return input.replace('\r', '')
+      self.__write(('PRIVMSG', safe(recipient)), safe(text))
       self.stack.append((time.time(), text))
       self.stack = self.stack[-10:]
 
@@ -158,6 +176,7 @@ class Bot(asynchat.async_chat):
       self.write(('NOTICE', dest), text)
 
    def error(self, origin): 
+      print >> sys.stderr, 'error!'
       try: 
          import traceback
          trace = traceback.format_exc()

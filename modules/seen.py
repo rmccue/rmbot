@@ -7,19 +7,23 @@ Licensed under the Eiffel Forum License 2.
 http://inamidst.com/phenny/
 """
 
+#from relativeDates import *
 import time
 
 def f_seen(bot, input): 
    """.seen <nick> - Reports when <nick> was last seen."""
    if input.sender == '#talis': return
+   if not input.group(2):
+      return bot.reply('Harp darp. You homunculus troglodyte, the syntax is: .seen <nick>')
    nick = input.group(2).lower()
    if not hasattr(bot, 'seen'): 
       return bot.reply('?')
    if bot.seen.has_key(nick): 
       channel, t = bot.seen[nick]
-      t = time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime(t))
+      t = time.strftime('%H:%M %d/%m/%Y', time.localtime(t))
 
-      msg = "I last saw %s at %s on %s" % (nick, t, channel)
+      msg = "I last saw %s at %s on %s" % (input.group(2), t, channel)
+#      msg = "%s last seen %s" % (input.group(2), timesince(t))
       bot.reply(msg)
    else: bot.reply("Sorry, I haven't seen %s around." % nick)
 f_seen.rule = (['seen'], r'(\S+)')
