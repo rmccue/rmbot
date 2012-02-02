@@ -132,9 +132,6 @@ class RNGBot(irc.Bot):
 		bytes, event, args = args[0], args[1], args[2:]
 		text = decode(bytes)
 		event = event.strip()
-		file = open('bot.log', 'a')
-		file.write('{1} - {0} {2}\n'.format(bytes, event, args))
-		file.close()
 
 		for priority in ('high', 'medium', 'low'):
 			items = self.commands[priority].items()
