@@ -121,6 +121,7 @@ class rmbot(irc.IRCClient):
 
 	def bind_commands(self):
 		self.commands = {'high': {}, 'medium': {}, 'low': {}}
+		self.doc = {}
 		
 		def bind(self, func): 
 			if not hasattr(func, 'regexp'):
