@@ -287,7 +287,7 @@ class rmbot(irc.IRCClient):
 				s.nick = s.user = origin.user
 				s.event = event
 				s.match = match
-				if match:
+				if hasattr(match, 'group'):
 					s.group = match.group
 					s.groups = match.groups
 				else:
