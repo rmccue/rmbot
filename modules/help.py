@@ -23,7 +23,6 @@ def list_help(bot, input):
 		bot.msg(input.user, 'For more information, try "!help <command>"')
 	else:
 		name = input.group(2)
-		print name
 		if not name in bot.doc:
 			for _name, info in bot.doc.items():
 				if name in info['commands']:
