@@ -181,9 +181,9 @@ def bom(bot, input):
 
 	bits = []
 	if data['temp']:
-		bits.append(u'{0}\u00B0C'.format(data['temp']))
+		bits.append(u'{0} C'.format(data['temp']))  # \u00B0
 	if data['apparenttemp']:
-		bits.append(u'({0}\u00B0C apparent)'.format(data['apparenttemp']))
+		bits.append(u'({0} C apparent)'.format(data['apparenttemp']))
 	if data['humidity']:
 		bits.append('Humidity {0}%'.format(data['humidity']))
 	if data['pressure']:
