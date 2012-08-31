@@ -231,8 +231,10 @@ class rmbot(irc.IRCClient):
 				match = False
 				if func.regexp:
 					for regex in func.regexp:
-						match = match or regex.match(text)
+						match = regex.match(text)
 						logging.debug('Checking {1}: {2}'.format(text.encode('utf-8'), regex.pattern, bool(match)))
+						if match:
+							break
 				else:
 					match = True
 
@@ -304,8 +306,8 @@ class rmbot(irc.IRCClient):
 					s.group = match.group
 					s.groups = match.groups
 				else:
-					s.group = None
-					s.groups = None
+					s.group = lambda x: None
+					s.groups = lambda x: ()
 				s.args = args
 				s.admin = origin.user in self.config.admins
 				s.owner = origin.user == self.config.owner
