@@ -85,6 +85,8 @@ def get_reddit_url(url):
 
 def imgur_linkage(bot, input):
 	matches = uri_matcher.search(input.group(1))
+	print matches
+	print input.group(1)
 	if not matches:
 		return
 

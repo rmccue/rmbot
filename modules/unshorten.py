@@ -12,7 +12,8 @@ import urllib, urllib2, urlparse, httplib
 #yoink! http://the.taoofmac.com/space/blog/2009/08/10/2205
 
 shorteners = ['tr.im','is.gd','tinyurl.com','bit.ly','snipurl.com','cli.gs',
-                'feedproxy.google.com','feeds.arstechnica.com', 'g.co']
+                'feedproxy.google.com','feeds.arstechnica.com', 'g.co', 't.co',
+                'fb.me', 'wp.me']
 twofers = [u'\u272Adf.ws']
 # learned hosts
 
