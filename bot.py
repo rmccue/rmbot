@@ -152,8 +152,8 @@ class rmbot(irc.IRCClient):
 
 		def sub(pattern, self=self): 
 			# These replacements have significant order
-			pattern = pattern.replace('$nickname', self.nickname)
-			return pattern.replace('$nick', r'%s[,:] +' % self.nickname)
+			pattern = pattern.replace('$nickname', re.escape(self.nickname))
+			return pattern.replace('$nick', r'%s[,:] +' % re.escape(self.nickname))
 
 		for name, func in self.variables.iteritems(): 
 			# print name, func
