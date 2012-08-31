@@ -70,7 +70,6 @@ def update(state):
 			elif celltype == 'pressure' or celltype == 'press':
 				data['pressure'] = value
 			elif celltype == 'rainsince9am':
-				print cell
 				data['rain'] = float(value) if value and value != 'Trace' else 0.0
 			elif celltype == 'wind':
 				subtype = headers[1].replace(prefix + '-', '')
@@ -130,7 +129,6 @@ def guess_place(place, state):
 		data = (possible, levenshtein(place.lower(), possible.lower()))
 		candidates.append(data)
 	candidates.sort(key=lambda x: x[1])
-	print candidates
 	return candidates[0][0]
 
 
