@@ -69,7 +69,7 @@ class Session:
 		return reply
 
 	def Ask(self,q):
-		self.params['stimulus'] = q
+		self.params['stimulus'] = q.encode('utf-8')
 		if self.MsgList:
 			self.params['lineref'] = '!0'+str(len(self.MsgList)/2)
 
