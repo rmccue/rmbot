@@ -131,10 +131,22 @@ class rmbot(irc.IRCClient):
 			# register documentation
 			if func.__doc__:
 				if hasattr(func, 'example'): 
-					example = func.example
-					example = example.replace('$nickname', self.nickname)
+					example = sub(func.example)
 				else: example = None
-				self.doc[func.name] = (func.__doc__, example)
+				self.doc[func.name] = {
+					'doc': func.__doc__,
+					'example': example,
+					'commands': [],
+				}
+				if hasattr(func, 'commands'):
+					self.doc[func.name]['commands'].extend(func.commands)
+				if hasattr(func, 'rule'):
+					if isinstance(func.rule, tuple):
+						if len(func.rule) == 2 and isinstance(func.rule[0], list):
+							self.doc[func.name]['commands'].extend(func.rule[0])
+						elif len(func.rule) == 3:
+							self.doc[func.name]['commands'].extend(func.rule[1])
+
 			self.commands[func.priority].setdefault(func.event, []).append(func)
 
 		def sub(pattern, self=self): 

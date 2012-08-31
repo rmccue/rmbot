@@ -2,24 +2,17 @@
 
 """ this is the help.py function """
 
-def f_help(bot, input): 
-   """
-   syntax: .f_help 
-   returns a list of the available modules.
-   type .<module> for specific f_help.
-   """
-   bot.reply("Listing available modules...")
-   for fn in bot.enable:
-      bot.reply(" %s", fn)
-   bot.reply("Done.")
-      
-#f_help.rule = ['f_help']
-f_help.priority = 'low'
-#f_help.rule = r'(.*)'
-f_help.rule = (['help'], r'(\S+)')
 
+def list_help(bot, input):
+	bot.reply('Check your PM for help.')
+	bot.msg(input.user, 'The following commands are available:')
+	for name, info in bot.doc.items():
+		command = name
+		if info['commands']:
+			if len(info['commands']) > 1:
+				command = '{0}{{{1}}}'.format(bot.config.prefix, ', '.join(info['commands']))
+			else:
+				command = bot.config.prefix + info['commands'][0]
+		bot.msg(input.user, '  {0}: {1}'.format(command, info['doc']))
 
-
-
-if __name__ == '__main__': 
-   print __doc__.strip()
+list_help.commands = ['help']
