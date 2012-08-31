@@ -59,6 +59,7 @@ def setup(self):
 
 
 def f_remind(phenny, input):
+	"""Leave a message for another user"""
 	teller = input.nick
 
 	# @@ Multiple comma-separated tellees? Cf. Terje, #swhack, 2006-04-15
@@ -111,6 +112,7 @@ def f_remind(phenny, input):
 		phenny.say("Hey, I'm not as stupid as Monkey you know!")
 
 	dumpReminders(phenny.tell_filename, phenny.reminders)  # @@ tell
+f_remind.example = ".tell rmccue that he's awesome"
 f_remind.rule = (['tell', 'ask'], r'(\S+) (.*)')
 
 
