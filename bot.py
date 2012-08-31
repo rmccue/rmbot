@@ -186,7 +186,7 @@ class rmbot(irc.IRCClient):
 
 					# 2) e.g. (['p', 'q'], '(.*)')
 					elif len(func.rule) == 2 and isinstance(func.rule[0], list): 
-						prefix = self.config.prefix
+						prefix = re.escape(self.config.prefix)
 						commands, pattern = func.rule
 						for command in commands: 
 							command = r'(%s)\b(?: +(?:%s))?' % (command, pattern)
@@ -205,7 +205,7 @@ class rmbot(irc.IRCClient):
 			if hasattr(func, 'commands'): 
 				for command in func.commands: 
 					template = r'^%s(%s)(?: +(.*))?$'
-					pattern = template % (self.config.prefix, command)
+					pattern = template % (re.escape(self.config.prefix), command)
 					func.regexp.append(re.compile(pattern))
 				bind(self, func)
 
@@ -512,7 +512,7 @@ def main():
 	config.filename = './config.py'
 
 	if not hasattr(config, 'prefix'): 
-		config.prefix = r'\.'
+		config.prefix = '.'
 
 	if not hasattr(config, 'name'): 
 		config.name = 'rmbot the awesome'
