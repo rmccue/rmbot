@@ -203,8 +203,6 @@ class rmbot(irc.IRCClient):
 	def notify(self, event, origin=None, args=[]):
 		event = event.lower()
 		logging.debug('Dispatching event {0}'.format(event))
-		if origin and 'rmbot' in origin.user:
-			return
 		for priority in ('high', 'medium', 'low'):
 			items = self.commands[priority]
 			if not event in items:
