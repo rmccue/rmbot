@@ -20,6 +20,7 @@ def list_help(bot, input):
 		for name, info in bot.doc.items():
 			command = get_command_string(info, bot.config.prefix, name)
 			bot.msg(input.user, '  {0}: {1}'.format(command, info['doc']))
+		bot.msg(input.user, 'For more information, try "!help <command>"')
 	else:
 		name = input.group(2)
 		print name
