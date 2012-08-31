@@ -124,11 +124,9 @@ class rmbot(irc.IRCClient):
 		
 		def bind(self, func): 
 			if not hasattr(func, 'regexp'):
-				func.regexp = ''
+				func.regexp = []
 			if not hasattr(func, 'name'):
 				func.name = func.__name__
-
-			logging.debug("{0} ({1}): {2}".format(func.name, func.priority, func.regexp.pattern.encode('utf-8')))
 
 			# register documentation
 			if func.__doc__:
@@ -157,10 +155,13 @@ class rmbot(irc.IRCClient):
 			elif isinstance(func.event, str):
 				func.event = func.event.lower()
 
+			if not hasattr(func, 'regexp'):
+				func.regexp = []
+
 			if hasattr(func, 'rule'):
 				if isinstance(func.rule, str): 
 					pattern = sub(func.rule)
-					func.regexp = re.compile(pattern)
+					func.regexp.append(re.compile(pattern))
 					bind(self, func)
 
 				if isinstance(func.rule, tuple): 
@@ -168,7 +169,7 @@ class rmbot(irc.IRCClient):
 					if len(func.rule) == 2 and isinstance(func.rule[0], str): 
 						prefix, pattern = func.rule
 						prefix = sub(prefix)
-						func.regexp = re.compile(prefix + pattern)
+						func.regexp.append(re.compile(prefix + pattern))
 						bind(self, func)
 
 					# 2) e.g. (['p', 'q'], '(.*)')
@@ -177,8 +178,8 @@ class rmbot(irc.IRCClient):
 						commands, pattern = func.rule
 						for command in commands: 
 							command = r'(%s)\b(?: +(?:%s))?' % (command, pattern)
-							func.regexp = re.compile(prefix + command)
-							bind(self, func)
+							func.regexp.append(re.compile(prefix + command))
+						bind(self, func)
 
 					# 3) e.g. ('$nick', ['p', 'q'], '(.*)')
 					elif len(func.rule) == 3: 
@@ -186,15 +187,15 @@ class rmbot(irc.IRCClient):
 						prefix = sub(prefix)
 						for command in commands: 
 							command = r'(%s) +' % command
-							func.regexp = re.compile(prefix + command + pattern)
-							bind(self, func)
+							func.regexp.append(re.compile(prefix + command + pattern))
+						bind(self, func)
 
 			if hasattr(func, 'commands'): 
 				for command in func.commands: 
 					template = r'^%s(%s)(?: +(.*))?$'
 					pattern = template % (self.config.prefix, command)
-					func.regexp = re.compile(pattern)
-					bind(self, func)
+					func.regexp.append(re.compile(pattern))
+				bind(self, func)
 
 			if not hasattr(func, 'rule') and not hasattr(func, 'commands'):
 				bind(self, func)
@@ -215,9 +216,11 @@ class rmbot(irc.IRCClient):
 				else:
 					text = ','.join(args)
 
+				match = False
 				if func.regexp:
-					match = func.regexp.match(text)
-					logging.debug('Checking {1}: {2}'.format(text.encode('utf-8'), func.regexp.pattern, bool(match)))
+					for regex in func.regexp:
+						match = match or regex.match(text)
+						logging.debug('Checking {1}: {2}'.format(text.encode('utf-8'), regex.pattern, bool(match)))
 				else:
 					match = True
 
