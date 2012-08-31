@@ -171,22 +171,13 @@ def message(phenny, input):
 message.rule = r'(.*)'
 message.priority = 'low'
 
-'''
-def pinged(bot, input):
-	for channel in bot.channels:
-		bot.write(('WHO', channel, '%cnf'))
-pinged.rule = r'(.*)'
-pinged.priority = 'low'
-pinged.event = 'PING'
-pinged.thread = False
 
-def who(phenny, input):
-	me, channel, nick, status = input.args
-	people[channel][nick] = status
-who.rule = r'(.*)'
-who.priority = 'low'
-who.event = '354'
-'''
+def user_joined(bot, input):
+	user = input.user
+	if user in bot.reminders:
+		bot.reply('You may have messages. Say something to hear them.')
+
+user_joined.event = 'userJoined'
 
 if __name__ == '__main__':
 	print __doc__.strip()
