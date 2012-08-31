@@ -108,7 +108,7 @@ class rmbot(irc.IRCClient):
 	def register_module(self, variables): 
 		# This is used by reload.py, hence it being methodised
 		for name, obj in variables.iteritems():
-			if hasattr(obj, 'commands') or hasattr(obj, 'rule'):
+			if hasattr(obj, 'commands') or hasattr(obj, 'rule') or hasattr(obj, 'event'):
 				self.variables[name] = obj
 
 	def connectionMade(self):
