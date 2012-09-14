@@ -36,19 +36,16 @@ def link(id):
 			return u"'{0}' - {1} views - http://youtu.be/{2}".format(entry.media.title.text('utf-8'), 0, id)
 		return None
 	except gdata.service.RequestError:
-		return "That video doesn't exist, you Monkey-esque moron. Almost as bad as alphabeat!"
+		return u"That video doesn't exist, you Monkey-esque moron. Almost as bad as alphabeat!"
 uri_matcher = re.compile(r'http://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+)')
 
 
 def yt_matcher(bot, input):
 	"""Gives information on YouTube links"""
-	matches = uri_matcher.search(input.group(1))
-	if not matches:
-		return
 
-	bot.say(link(matches.group(1)))
+	bot.say(link(input.group(1)))
 yt_matcher.name = 'YouTube Autolinker'
-yt_matcher.rule = r'.*(http://(?:www\.)?youtu(?:\.be|be\.com)/.*)'
+yt_matcher.rule = r'.*http://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+).*'
 yt_matcher.priority = 'low'
 
 
