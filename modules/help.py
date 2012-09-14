@@ -17,20 +17,20 @@ def list_help(bot, input):
 		# General help
 		bot.reply('Check your PM for help.')
 		bot.msg(input.user, 'The following commands are available:')
-		for name, info in bot.doc.items():
+		for name, info in bot.dispatcher.doc.items():
 			command = get_command_string(info, bot.config.prefix, name)
 			bot.msg(input.user, '  {0}: {1}'.format(command, info['doc']))
 		bot.msg(input.user, 'For more information, try "!help <command>"')
 	else:
 		name = input.group(2)
-		if not name in bot.doc:
-			for _name, info in bot.doc.items():
+		if not name in bot.dispatcher.doc:
+			for _name, info in bot.dispatcher.doc.items():
 				if name in info['commands']:
 					name = _name
-			if not name in bot.doc:
+			if not name in bot.dispatcher.doc:
 				bot.reply("Sorry, I can't help with that")
 				return
-		info = bot.doc[name]
+		info = bot.dispatcher.doc[name]
 		command = get_command_string(info, bot.config.prefix, name)
 		bot.reply('{0}: {1}'.format(command, info['doc']))
 		if info['example']:
