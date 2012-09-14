@@ -19,27 +19,10 @@ def f_reload(bot, input):
 		return bot.reply('done')
 
 	try:
-		try:
-			module = getattr(__import__('modules.' + name), name)
-		except ImportError, e:
-			print e
-			module = getattr(__import__('opt.' + name), name)
+		module, modified = bot.dispatcher.reload_module(name)
+		bot.reply('%r (version: %s)' % (module, modified))
 	except ImportError:
 		return bot.reply('Module not found')
-	reload(module)
-
-	if hasattr(module, '__file__'):
-		import os.path
-		import time
-		mtime = os.path.getmtime(module.__file__)
-		modified = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(mtime))
-	else:
-		modified = 'unknown'
-
-	bot.register_module(vars(module))
-	bot.bind_commands()
-
-	bot.reply('%r (version: %s)' % (module, modified))
 f_reload.name = 'reload'
 f_reload.rule = ('$nick', ['reload'], r'(\S+)?')
 f_reload.priority = 'low'
