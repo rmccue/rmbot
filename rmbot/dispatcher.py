@@ -30,7 +30,7 @@ class Dispatcher(object):
 				logging.error("Error loading %s: %s (in bot.py)" % (name, e))
 			else:
 				if hasattr(module, 'setup'):
-					module.setup(self)
+					module.setup(self.bot)
 				self.register_module(module)
 				modules.append(name)
 				self.modules[name] = module
