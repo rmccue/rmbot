@@ -140,7 +140,7 @@ def wikipedia(term, last=False):
 
 	if ((sentence == 'Wikipedia does not have an article with this exact name.')
 	or (sentence == 'Wikipedia does not have a page with this exact name.')
-	or (sentence == "Search for '{0}' in existing articles.".format(term))):
+	or (sentence == 'Search for "{0}" in existing articles.'.format(term))):
 		if not last:
 			term = search(term)
 			return wikipedia(term, last=True)
