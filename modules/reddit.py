@@ -45,7 +45,10 @@ def link(id):
    results = query('comments/' + id)
    if results[0]['data']['children'][0]: 
       post = results[0]['data']['children'][0]['data']
-      return "'%s' - +%d/-%d - http://redd.it/%s" % (post['title'], post['ups'], post['downs'], post['id'])
+      if post['over_18'] == True:
+        return "'%s' - +%d/-%d - http://redd.it/%s [NSFW]" % (post['title'], post['ups'], post['downs'], post['id'])
+      else:
+        return "'%s' - +%d/-%d - http://redd.it/%s" % (post['title'], post['ups'], post['downs'], post['id'])
    return None
 
 def reddit(phenny, input): 
