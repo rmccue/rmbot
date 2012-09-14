@@ -17,7 +17,7 @@ def cleverircbot(phenny, input):
 	question = input.group(1).strip()
 	question = pattern.sub(cleverbotnick, question)
 	if question.startswith('reload'):
-		if not input.owner:
+		if not input.admin:
 			response = "%s_%s" % (unichr(3232), unichr(3232))
 			phenny.reply(response)
 		return
