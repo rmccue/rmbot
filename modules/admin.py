@@ -62,7 +62,7 @@ def me(bot, input):
 	if input.sender.startswith('#') and not input.sender == '#rmccue':
 		return
 	if input.admin:
-		bot.action(input.group(2), msg)
+		bot.action(input.group(2).encode('utf-8'), input.group(3))
 me.rule = (['me'], r'(#?\S+) (.*)')
 me.priority = 'low'
 
