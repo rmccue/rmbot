@@ -78,7 +78,10 @@ def get_reddit_url(url):
 	try:
 		result = json.loads(bytes)
 		post = result['data']['children'][0]['data']
-		return "'{0}' - +{1}/-{2} - http://redd.it/{3}".format(post['title'], post['ups'], post['downs'], post['id'])
+		if post['over_18'] == True:
+			return "'%s' - +%d/-%d - http://redd.it/%s [NSFW]" % (post['title'], post['ups'], post['downs'], post['id'])
+		else:
+			return "'%s' - +%d/-%d - http://redd.it/%s" % (post['title'], post['ups'], post['downs'], post['id'])
 	except:
 		return ''
 

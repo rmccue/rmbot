@@ -32,8 +32,8 @@ def link(id):
 		if entry:
 			#return "'{0}' - {1} views - {2}".format(entry.media.title.text, group(entry.statistics.view_count), entry.media.player.url.replace('&feature=youtube_gdata_player', ''))
 			if entry.statistics:
-					return "'{0}' - {1} views - http://youtu.be/{2}".format(entry.media.title.text, group(entry.statistics.view_count), id)
-			return "'{0}' - {1} views - http://youtu.be/{2}".format(entry.media.title.text, 0, id)
+					return u"'{0}' - {1} views - http://youtu.be/{2}".format(entry.media.title.text.decode('utf-8'), group(entry.statistics.view_count), id)
+			return u"'{0}' - {1} views - http://youtu.be/{2}".format(entry.media.title.text('utf-8'), 0, id)
 		return None
 	except gdata.service.RequestError:
 		return "That video doesn't exist, you Monkey-esque moron. Almost as bad as alphabeat!"
