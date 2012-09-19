@@ -9,7 +9,7 @@ http://inamidst.com/phenny/
 
 import re
 import web
-
+import urllib2
 r_string = re.compile(r'("(\\.|[^"\\])*")')
 r_json = re.compile(r'^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]+$')
 env = {'__builtins__': None, 'null': None, 'true': True, 'false': False}
@@ -25,21 +25,25 @@ def json(text):
 def search(query, n=1): 
    """Search using SearchMash, return its JSON."""
    q = web.urllib.quote(query.encode('utf-8'))
-   uri = 'http://www.searchmash.com/results/' + q + '?n=' + str(n)
-   bytes = web.get(uri)
-   return json(bytes)
+   uri = 'https://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=' + q + '&num=' + str(n)
+   referer = "mcau.org"
+   request = urllib2.Request(uri)
+   request.add_header('Referer',referer)
+   bytes = urllib2.urlopen(request)
+   return json(bytes.fp.read())
 
 def result(query): 
    results = search(query)
-   if results['results']: 
-      return results['results'][0]['url']
+   print results
+   if results['responseData']['results']: 
+      return urllib2.unquote(results['responseData']['results'][0]['url'])
    return None
 
 def count(query): 
    results = search(query)
-   if not results['results']: 
+   if not results['responseData']['cursor']: 
       return '0'
-   return results['estimatedCount']
+   return results['responseData']['cursor']['estimatedResultCount']
 
 def formatnumber(n): 
    """Format a number with beautiful commas."""
@@ -70,7 +74,7 @@ def gc(phenny, input):
    if not query: 
       return phenny.reply('.gc what?')
    num = count(query)
-   phenny.say(query + ': ' + num)
+   phenny.say(query + ': ' + formatnumber(num) + ' results')
 gc.commands = ['gc']
 gc.priority = 'high'
 gc.example = '.gc extrapolate'
