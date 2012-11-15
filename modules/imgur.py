@@ -3,8 +3,8 @@ import web
 import json
 from datetime import datetime
 
-uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)\.?(?:.*)')
-
+#uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)\.?(?:.*)')
+uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:.?)(\w+)?')
 
 def group(number):
 	s = '%d' % int(number)
@@ -69,6 +69,17 @@ def query(bits, n=1):
 		return None
 	return result
 
+def album_query(bits, n=1):
+        """Search using SearchMash, return its JSON."""
+        q = web.urllib.quote(bits.encode('utf-8'))
+        uri = 'http://api.imgur.com/2/album/{0}.json'.format(q)
+        bytes = web.get(uri)
+        try:
+                result = json.loads(bytes)
+        except:
+                return None
+        return result
+
 
 def get_reddit_url(url):
 	q = web.urllib.quote(url.encode('utf-8'))
@@ -93,26 +104,45 @@ def imgur_linkage(bot, input):
 	if not matches:
 		return
 
-	result = query(matches.group(1))
-	guess = get_reddit_url(input.group(1))
+	if matches.group(1) == 'a':
+		result = album_query(matches.group(2))
+		guess = ''
+	else:
+		result = query(matches.group(1))
+		guess = get_reddit_url(input.group(1))
 
 	if not result:
 		return bot.say("I think imgur is down...")
 
-	if not "image" in result['image']:
+	if "image" in result:
+		image = result['image']['image']
+		title = '<Untitled>'
+		if image['title']:
+			title = image['title']
+
+		if image['animated'] == 'true':
+			title += '[GIF]'
+
+		time = datetime.strptime(image['datetime'], '%Y-%m-%d %H:%M:%S')
+
+		text = '{0} - Posted {1}, {2} views'.format(title, pretty_date(time), group(image['views']))
+	elif "album" in result:
+		album = result['album']
+	
+		title='<Untitled>'
+		if album['title']:
+			title=album['title']
+	
+		imagetimes = list()
+		for image in album['images']:
+			imagetimes.append(datetime.strptime(image['image']['datetime'], '%Y-%m-%d %H:%M:%S'))
+	
+		time = max(imagetimes)
+	
+		text = '{0} - Posted {1}'.format(title, pretty_date(time))
+	else:
 		return
-
-	image = result['image']['image']
-	title = '<Untitled>'
-	if image['title']:
-		title = image['title']
-
-	if image['animated'] == 'true':
-		title += '[GIF]'
-
-	time = datetime.strptime(image['datetime'], '%Y-%m-%d %H:%M:%S')
-
-	text = 'Posted {1}, {2} views'.format(title, pretty_date(time), group(image['views']))
+		
 	bot.say(text)
 	if guess:
 		bot.say(guess)
