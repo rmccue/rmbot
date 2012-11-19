@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 #uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)\.?(?:.*)')
-uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:.?)(\w+)?')
+uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:.?)(\w+)?\.?(?:.*)')
 
 def group(number):
 	s = '%d' % int(number)
@@ -21,7 +21,7 @@ def pretty_date(time=False):
 	pretty string like 'an hour ago', 'Yesterday', '3 months ago',
 	'just now', etc
 	"""
-	now = datetime.now()
+	now = datetime.utcnow()
 	if type(time) is int:
 		diff = now - datetime.fromtimestamp(time)
 	elif isinstance(time, datetime):
@@ -116,7 +116,7 @@ def imgur_linkage(bot, input):
 
 	if "image" in result:
 		image = result['image']['image']
-		title = '<Untitled>'
+		title = ''
 		if image['title']:
 			title = image['title']
 
@@ -125,11 +125,14 @@ def imgur_linkage(bot, input):
 
 		time = datetime.strptime(image['datetime'], '%Y-%m-%d %H:%M:%S')
 
-		text = '{0} - Posted {1}, {2} views'.format(title, pretty_date(time), group(image['views']))
+		if title == '':
+			text = 'Posted {0}, {1} views'.format(pretty_date(time), group(image['views']))
+		else:
+			text = '{0} - Posted {1}, {2} views'.format(title, pretty_date(time), group(image['views']))
 	elif "album" in result:
 		album = result['album']
 	
-		title='<Untitled>'
+		title=''
 		if album['title']:
 			title=album['title']
 	
@@ -138,8 +141,11 @@ def imgur_linkage(bot, input):
 			imagetimes.append(datetime.strptime(image['image']['datetime'], '%Y-%m-%d %H:%M:%S'))
 	
 		time = max(imagetimes)
-	
-		text = '{0} - Posted {1}'.format(title, pretty_date(time))
+		
+		if title == '':
+			text = 'Posted {0}'.format(pretty_date(time))
+		else:
+			text = '{0} - Posted {1}'.format(title, pretty_date(time))
 	else:
 		return
 		
