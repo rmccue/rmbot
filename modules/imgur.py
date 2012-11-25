@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 #uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)\.?(?:.*)')
-uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:.?)(\w+)?\.?(?:.*)')
+uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:/(\w+))?')
 
 def group(number):
 	s = '%d' % int(number)
