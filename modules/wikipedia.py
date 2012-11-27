@@ -64,9 +64,8 @@ def wplinker(bot, input):
 
 	try:
 		result = get_page(term)
-		bot.say(u'{0}'.format(
-			result['extract'].strip())
-		))
+		bot.say(u'{0}'.format(result['extract'].strip()))
+
 	except NotFound:
 		bot.reply('Page does not appear to exist.')
 wplinker.rule = r'.*http://en.wikipedia.org/wiki/([\w:-]+).*'
