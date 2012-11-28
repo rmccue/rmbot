@@ -12,8 +12,13 @@ Example of how to use the bindings:
 
 import urllib
 import urllib2
-import md5
 import re
+
+# md5 depreciated in Python 2.5
+try:
+	from hashlib import md5
+except ImportError:
+	from md5 import md5
 
 class ServerFullError(Exception):
 	pass
@@ -60,7 +65,7 @@ class Session:
 	def Send(self):
 		data = urllib.urlencode(self.params)
 		digest_txt = data[9:29]
-		self.params['icognocheck'] = md5.new(digest_txt).hexdigest()
+		self.params['icognocheck'] = md5(digest_txt).hexdigest()
 		data = urllib.urlencode(self.params)
 		print self.params
 		req = urllib2.Request("http://www.cleverbot.com/webservicemin", data, self.headers)
