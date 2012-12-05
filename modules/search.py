@@ -9,7 +9,7 @@ http://inamidst.com/phenny/
 
 import re
 import web
-
+import urllib2
 r_string = re.compile(r'("(\\.|[^"\\])*")')
 r_json = re.compile(r'^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]+$')
 env = {'__builtins__': None, 'null': None, 'true': True, 'false': False}
@@ -19,27 +19,35 @@ def json(text):
    if r_json.match(r_string.sub('', text)): 
       text = r_string.sub(lambda m: 'u' + m.group(1), text)
       return eval(text.strip(' \t\r\n'), env, {})
-   print text
    raise ValueError('Input must be serialised JSON.')
 
 def search(query, n=1): 
-   """Search using SearchMash, return its JSON."""
+   """Search using Google Custom Search API, return its JSON."""
+
+   # Config items - update for each instance
+   api_key = 'AIzaSyASWY7Ax9zMhQ7ufauTuxzHpI1f2xXKAXQ'
+   cse_id = '008860205316108390293:n8kzzpmclf4'
+   referer = "mcau.org"
+   # End Config items
+
    q = web.urllib.quote(query.encode('utf-8'))
-   uri = 'http://www.searchmash.com/results/' + q + '?n=' + str(n)
-   bytes = web.get(uri)
-   return json(bytes)
+   uri = 'https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + cse_id + '&q=' + q + '&num=' + str(n)
+   request = urllib2.Request(uri)
+   request.add_header('Referer',referer)
+   bytes = urllib2.urlopen(request)
+   return json(bytes.fp.read())
 
 def result(query): 
    results = search(query)
-   if results['results']: 
-      return results['results'][0]['url']
+   if results['queries']['request']: 
+      return urllib2.unquote(results['items'][0]['title']), urllib2.unquote(results['items'][0]['link'])
    return None
 
 def count(query): 
    results = search(query)
-   if not results['results']: 
+   if not results['queries']['request']: 
       return '0'
-   return results['estimatedCount']
+   return results['queries']['request'][0]['totalResults']
 
 def formatnumber(n): 
    """Format a number with beautiful commas."""
@@ -53,9 +61,9 @@ def g(phenny, input):
    query = input.group(2)
    if not query: 
       return phenny.reply('.g what?')
-   uri = result(query)
+   title, uri = result(query)
    if uri: 
-      phenny.reply(uri)
+      phenny.reply(title + ' - '+ uri)
       if not hasattr(phenny.bot, 'last_seen_uri'):
          phenny.bot.last_seen_uri = {}
       phenny.bot.last_seen_uri[input.sender] = uri
@@ -70,7 +78,7 @@ def gc(phenny, input):
    if not query: 
       return phenny.reply('.gc what?')
    num = count(query)
-   phenny.say(query + ': ' + num)
+   phenny.say(query + ': ' + formatnumber(num) + ' results')
 gc.commands = ['gc']
 gc.priority = 'high'
 gc.example = '.gc extrapolate'
