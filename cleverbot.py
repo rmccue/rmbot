@@ -62,7 +62,6 @@ class Session:
 		digest_txt = data[9:29]
 		self.params['icognocheck'] = md5.new(digest_txt).hexdigest()
 		data = urllib.urlencode(self.params)
-		print self.params
 		req = urllib2.Request("http://www.cleverbot.com/webservicemin", data, self.headers)
 		f = urllib2.urlopen(req)
 		reply = f.read()
@@ -90,7 +89,7 @@ class Session:
 			if len(latest) == 0:
 				break
 			num = 'vText{0}'.format(i)
-			self.params[num] = latest.pop()
+			self.params[num] = latest.pop().encode('utf-8')
 
 def prevref(text):
 	pos = text.split('\r')
