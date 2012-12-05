@@ -58,6 +58,7 @@ class Session:
 		self.MsgList=[]
 
 	def Send(self):
+		print self.params
 		data = urllib.urlencode(self.params)
 		digest_txt = data[9:29]
 		self.params['icognocheck'] = md5.new(digest_txt).hexdigest()
@@ -90,7 +91,7 @@ class Session:
 			if len(latest) == 0:
 				break
 			num = 'vText{0}'.format(i)
-			self.params[num] = latest.pop()
+			self.params[num] = latest.pop().encode('utf-8')
 
 def prevref(text):
 	pos = text.split('\r')
