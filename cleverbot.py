@@ -58,12 +58,10 @@ class Session:
 		self.MsgList=[]
 
 	def Send(self):
-		print self.params
 		data = urllib.urlencode(self.params)
 		digest_txt = data[9:29]
 		self.params['icognocheck'] = md5.new(digest_txt).hexdigest()
 		data = urllib.urlencode(self.params)
-		print self.params
 		req = urllib2.Request("http://www.cleverbot.com/webservicemin", data, self.headers)
 		f = urllib2.urlopen(req)
 		reply = f.read()
