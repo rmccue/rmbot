@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 #uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)\.?(?:.*)')
-uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(\w+)(?:/(\w+))?')
+uri_matcher = re.compile(r'http://(?:i\.)?imgur\.com/(?:(a)(?:/(\w+))?|(\w+\b(?!/))\.?\w?)')
 
 def group(number):
 	s = '%d' % int(number)
@@ -106,10 +106,13 @@ def imgur_linkage(bot, input):
 
 	if matches.group(1) == 'a':
 		result = album_query(matches.group(2))
-		guess = ''
-	else:
-		result = query(matches.group(1))
 		guess = get_reddit_url(input.group(1))
+	elif matches.group(3) is not None:
+		result = query(matches.group(3))
+		guess = get_reddit_url(input.group(1))
+
+	else:
+		return
 
 	if not result:
 		return bot.say("I think imgur is down...")
