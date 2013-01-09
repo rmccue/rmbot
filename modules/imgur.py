@@ -114,7 +114,7 @@ def imgur_linkage(bot, input):
 	else:
 		return
 
-        if not result:
+	if not result:
 		return bot.say("I think imgur is down...")
 
 	if "image" in result:
