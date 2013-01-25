@@ -10,6 +10,51 @@ http://inamidst.com/phenny/
 import web
 import json
 import urllib
+from datetime import datetime
+
+
+def pretty_date(time=False):
+        """
+        Get a datetime object or a int() Epoch timestamp and return a
+        pretty string like 'an hour ago', 'Yesterday', '3 months ago',
+        'just now', etc
+        """
+        now = datetime.utcnow()
+        if type(time) is int:
+                diff = now - datetime.fromtimestamp(time)
+        elif isinstance(time, datetime):
+                diff = now - time
+        elif not time:
+                diff = now - now
+        second_diff = diff.seconds
+        day_diff = diff.days
+
+        if day_diff < 0:
+                return ''
+
+        if day_diff == 0:
+                if second_diff < 10:
+                        return "just now"
+                if second_diff < 60:
+                        return str(second_diff) + " seconds ago"
+                if second_diff < 120:
+                        return  "a minute ago"
+                if second_diff < 3600:
+                        return str(second_diff / 60) + " minutes ago"
+                if second_diff < 7200:
+                        return "an hour ago"
+                if second_diff < 86400:
+                        return str(second_diff / 3600) + " hours ago"
+        if day_diff == 1:
+                return "Yesterday"
+        if day_diff < 7:
+                return str(day_diff) + " days ago"
+        if day_diff < 31:
+                return str(day_diff / 7) + " weeks ago"
+        if day_diff < 365:
+                return str(day_diff / 30) + " months ago"
+        return str(day_diff / 365) + " years ago"
+
 
 def query(bits, query = {}):
 	q = web.urllib.quote(bits.encode('utf-8'))
@@ -35,8 +80,11 @@ def latest(user):
 
 def content(id):
 	result = query('statuses/show/' + id)
+
 	if 'text' in result.keys():
-		return u"@{0}: {1}".format(result['user']['screen_name'], result['text'])
+	        time = datetime.strptime(result['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+
+		return u"@{0}: {1} - {2}".format(result['user']['screen_name'], result['text'], pretty_date(time))
 	return None
 
 def user(rmbot, input):
