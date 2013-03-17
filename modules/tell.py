@@ -95,9 +95,6 @@ def f_remind(phenny, input):
 			phenny.reminders[tellee].append((teller, verb, timenow, msg))
 		# @@ Stephanie's augmentation
 		response = "I'll pass that on when %s is around." % tellee_original
-		if warn:
-			response += (" I'll have to use a pastebin, though, so " +
-									"your message may get lost.")
 
 		rand = random.random()
 		if rand > 0.9999:
@@ -152,21 +149,8 @@ def message(phenny, input):
 		elif tellee.lower().startswith(remkey.rstrip('*:')):
 			reminders.extend(getReminders(phenny, channel, remkey, tellee))
 
-	if len(reminders) < maximum:
-		for line in reminders:
-			phenny.msg(tellee, tellee + ": " + line)
-	else:
-		try:
-			data = {
-				'title': 'Messages for %s' % tellee,
-				'content': '\n'.join(reminders) + '\n',
-			}
-			result = urllib2.urlopen('http://dpaste.com/api/v1/', urllib.urlencode(data))
-			message = '%s: see %s for your messages' % (tellee, result.geturl())
-			phenny.msg(tellee, message)
-		except Exception:
-			error = '[Sorry, some messages were elided and lost...]'
-			phenny.msg(tellee, error)
+	for line in reminders:
+		phenny.msg(tellee, tellee + ": " + line)
 
 	if len(phenny.reminders.keys()) != remkeys:
 		dumpReminders(phenny.tell_filename, phenny.reminders)  # @@ tell
