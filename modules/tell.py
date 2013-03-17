@@ -154,7 +154,7 @@ def message(phenny, input):
 
 	if len(reminders) < maximum:
 		for line in reminders:
-			phenny.say(tellee + ": " + line)
+			phenny.msg(tellee, tellee + ": " + line)
 	else:
 		try:
 			data = {
@@ -163,10 +163,10 @@ def message(phenny, input):
 			}
 			result = urllib2.urlopen('http://dpaste.com/api/v1/', urllib.urlencode(data))
 			message = '%s: see %s for your messages' % (tellee, result.geturl())
-			phenny.say(message)
+			phenny.msg(tellee, message)
 		except Exception:
 			error = '[Sorry, some messages were elided and lost...]'
-			phenny.say(error)
+			phenny.msg(tellee, error)
 
 	if len(phenny.reminders.keys()) != remkeys:
 		dumpReminders(phenny.tell_filename, phenny.reminders)  # @@ tell
