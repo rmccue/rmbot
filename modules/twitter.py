@@ -10,6 +10,8 @@ http://inamidst.com/phenny/
 import web
 import json
 import urllib
+from datetime import datetime
+from relativeDates import timesince
 
 def query(bits, query = {}):
 	q = web.urllib.quote(bits.encode('utf-8'))
@@ -35,8 +37,11 @@ def latest(user):
 
 def content(id):
 	result = query('statuses/show/' + id)
+
 	if 'text' in result.keys():
-		return u"@{0}: {1}".format(result['user']['screen_name'], result['text'])
+	        time = datetime.strptime(result['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+
+		return u"@{0}: {1} - {2} ago".format(result['user']['screen_name'], result['text'], timesince(time,datetime.utcnow()))
 	return None
 
 def user(rmbot, input):
