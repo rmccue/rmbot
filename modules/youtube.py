@@ -37,7 +37,7 @@ def link(id):
 		return None
 	except gdata.service.RequestError:
 		return u"That video doesn't exist, you Monkey-esque moron. Almost as bad as alphabeat!"
-uri_matcher = re.compile(r'http://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+)')
+uri_matcher = re.compile(r'https?://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+)')
 
 
 def yt_matcher(bot, input):
