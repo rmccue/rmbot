@@ -14,15 +14,8 @@ class Dispatcher(object):
 		self.modules = {}
 
 	def load_modules(self):
-		#filenames = []
-		#home = os.getcwd()
-		#for fn in self.bot.factory.config.enable:
-			#filenames.append(os.path.join(home, 'modules', fn + '.py'))
-
 		modules = []
 		for name in self.bot.factory.config.enable:
-			#name = os.path.basename(filename)[:-3]
-
 			try:
 				file, filename, data = imp.find_module(name, ['modules'])
 				module = imp.load_module(name, file, filename, data)
@@ -45,9 +38,6 @@ class Dispatcher(object):
 	def reload_module(self, name):
 		file, filename, data = imp.find_module(name, ['modules'])
 		module = imp.load_module(name, file, filename, data)
-		#module = self.modules[name]
-		#print module
-		#reload(module)
 
 		if hasattr(module, '__file__'):
 			import os.path
