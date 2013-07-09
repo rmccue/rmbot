@@ -217,7 +217,7 @@ class Dispatcher(object):
 			def __getattr__(self, attr):
 				if attr == 'motion':
 					return (lambda msg:
-						self.bot.action(origin.channel, msg))
+						self.bot.describe(origin.channel, msg))
 				elif attr == 'reply':
 					return (lambda msg:
 						self.bot.msg(origin.channel, origin.user + ': ' + msg))
