@@ -291,7 +291,7 @@ class BotFactory(protocol.ClientFactory):
 
 def main():
 	#name = os.path.basename(config_name).split('.')[0] + '_config'
-	config = imp.load_source('rng_config', './config.py')
+	config = imp.load_source('bot_config', './config.py')
 	config.filename = './config.py'
 
 	if not hasattr(config, 'prefix'):
