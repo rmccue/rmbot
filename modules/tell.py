@@ -14,58 +14,27 @@ import urllib
 import urllib2
 import collections
 
+import logging
+
 maximum = 2
 lastrun = 0
 people = collections.defaultdict(dict)
 
 
-def loadReminders(fn):
-	result = {}
-	f = open(fn)
-	for line in f:
-		line = line.strip()
-		if line:
-			tellee, teller, verb, timenow, msg = line.split('\t', 4)
-			result.setdefault(tellee, []).append((teller, verb, timenow, msg))
-	f.close()
-	return result
+def setup(bot):
+	bot.reminders = bot.db.get('tell.reminders')
+	if not bot.reminders:
+		bot.reminders = {}
 
 
-def dumpReminders(fn, data):
-	f = open(fn, 'w')
-	for tellee in data.iterkeys():
-		for remindon in data[tellee]:
-			line = '\t'.join((tellee,) + remindon)
-			f.write(line + '\n')
-	try:
-		f.close()
-	except IOError:
-		pass
-	return True
-
-
-def setup(self):
-	fn = ''.join(i for i in self.nickname if i not in r'\/:*?"<>|') + '-' + self.config.host + '.tell.db'
-	self.tell_filename = os.path.join(os.getcwd(), fn)
-	if not os.path.exists(self.tell_filename):
-		try:
-			f = open(self.tell_filename, 'w')
-		except OSError:
-			pass
-		else:
-			f.write('')
-			f.close()
-	self.reminders = loadReminders(self.tell_filename)  # @@ tell
-
-
-def f_remind(phenny, input):
+def tell(bot, input):
 	"""Leave a message for another user"""
 	teller = input.nick
 
 	# @@ Multiple comma-separated tellees? Cf. Terje, #swhack, 2006-04-15
 	verb, tellee, msg = input.groups()
 	if not tellee or not msg:
-		return phenny.reply('Syntax: .tell/.ask <nick> <msg>')
+		return bot.reply('Syntax: .tell/.ask <nick> <msg>')
 	verb = verb.encode('utf-8')
 	tellee = tellee.encode('utf-8')
 	msg = msg.encode('utf-8')
@@ -73,26 +42,23 @@ def f_remind(phenny, input):
 	tellee_original = tellee.rstrip(',:;')
 	tellee = tellee_original.lower()
 
-	if not os.path.exists(phenny.tell_filename):
-		return
-
 	if len(tellee) > 20:
-		return phenny.reply('That nickname is too long.')
+		return bot.reply('That nickname is too long.')
 
 	if input.sender in people and tellee in people[input.sender]:
 		print 'status of %s is %s' % (tellee, people[input.sender][tellee])
 #   timenow = time.strftime('%d %b %H:%MZ', time.gmtime())
 # alphabeat patched to local time
 	timenow = time.strftime('%d %b %H:%M', time.localtime())
-	if not tellee in (teller.lower(), phenny.nickname, 'me'):  # @@
+	if not tellee in (teller.lower(), bot.nickname, 'me'):  # @@
 		# @@ <deltab> and year, if necessary
 		warn = False
-		if not tellee in phenny.reminders:
-			phenny.reminders[tellee] = [(teller, verb, timenow, msg)]
+		if not tellee in bot.reminders:
+			bot.reminders[tellee] = [(teller, verb, timenow, msg)]
 		else:
-			if len(phenny.reminders[tellee]) >= maximum:
+			if len(bot.reminders[tellee]) >= maximum:
 				warn = True
-			phenny.reminders[tellee].append((teller, verb, timenow, msg))
+			bot.reminders[tellee].append((teller, verb, timenow, msg))
 		# @@ Stephanie's augmentation
 		response = "I'll pass that on when %s is around." % tellee_original
 
@@ -102,58 +68,58 @@ def f_remind(phenny, input):
 		elif rand > 0.999:
 			response = "yeah, sure, whatever"
 
-		phenny.reply(response)
+		bot.reply(response)
+
+		bot.db.set('tell.reminders', bot.reminders)
+
 	elif teller.lower() == tellee:
-		phenny.say('You can %s yourself that.' % verb)
+		bot.say('You can %s yourself that.' % verb)
 	else:
-		phenny.say("Hey, I'm not as stupid as Monkey you know!")
+		bot.say("Hey, I'm not as stupid as Monkey you know!")
 
-	dumpReminders(phenny.tell_filename, phenny.reminders)  # @@ tell
-f_remind.example = ".tell rmccue that he's awesome"
-f_remind.rule = (['tell', 'ask'], r'(\S+) (.*)')
+tell.example = ".tell rmccue that he's awesome"
+tell.rule = (['tell', 'ask'], r'(\S+) (.*)')
 
 
-def getReminders(phenny, channel, key, tellee):
+def getReminders(bot, channel, key, tellee):
 	lines = []
 	template = "%s <%s> %s %s %s"
 	today = time.strftime('%d %b', time.gmtime())
 
-	for (teller, verb, datetime, msg) in phenny.reminders[key]:
+	for (teller, verb, datetime, msg) in bot.reminders[key]:
 		if datetime.startswith(today):
 			datetime = datetime[len(today) + 1:]
 		lines.append(template % (datetime, teller, verb, tellee, msg))
 
 	try:
-		del phenny.reminders[key]
+		del bot.reminders[key]
 	except KeyError:
-		phenny.msg(channel, 'Er...')
+		bot.msg(channel, 'Er...')
 	return lines
 
 
-def message(phenny, input):
+def message(bot, input):
 	if not input.sender.startswith('#'):
 		return
 
 	tellee = input.nick
 	channel = input.sender
 
-	if not os.path.exists(phenny.tell_filename):
-		return
-
 	reminders = []
-	remkeys = list(reversed(sorted(phenny.reminders.keys())))
+	remkeys = list(reversed(sorted(bot.reminders.keys())))
 	for remkey in remkeys:
 		if not remkey.endswith('*') or remkey.endswith(':'):
 			if tellee.lower() == remkey:
-				reminders.extend(getReminders(phenny, channel, remkey, tellee))
+				reminders.extend(getReminders(bot, channel, remkey, tellee))
 		elif tellee.lower().startswith(remkey.rstrip('*:')):
-			reminders.extend(getReminders(phenny, channel, remkey, tellee))
+			reminders.extend(getReminders(bot, channel, remkey, tellee))
 
 	for line in reminders:
-		phenny.msg(tellee, tellee + ": " + line)
+		bot.msg(tellee, tellee + ": " + line)
 
-	if len(phenny.reminders.keys()) != remkeys:
-		dumpReminders(phenny.tell_filename, phenny.reminders)  # @@ tell
+	if len(bot.reminders.keys()) != remkeys:
+		bot.db.set('tell.reminders', bot.reminders)  # @@ tell
+
 message.rule = r'(.*)'
 message.priority = 'low'
 
