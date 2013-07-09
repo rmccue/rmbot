@@ -119,8 +119,7 @@ class Dispatcher(object):
 			elif isinstance(func.event, str):
 				func.event = func.event.lower()
 
-			if not hasattr(func, 'regexp'):
-				func.regexp = []
+			func.regexp = []
 
 			if hasattr(func, 'rule'):
 				if isinstance(func.rule, str):
