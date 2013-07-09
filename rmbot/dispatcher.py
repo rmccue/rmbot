@@ -57,6 +57,9 @@ class Dispatcher(object):
 		else:
 			modified = 'unknown'
 
+		if hasattr(module, 'setup'):
+			module.setup(self.bot)
+
 		self.register_module(module)
 		self.bind_commands()
 		return module, modified
