@@ -11,6 +11,7 @@ import inspect
 
 # rmbot imports
 from rmbot.dispatcher import Dispatcher
+from rmbot.pickledb import pickledb
 
 
 class Origin(object):
@@ -76,6 +77,9 @@ class rmbot(irc.IRCClient):
 			raise AttributeError
 
 	def setup(self):
+		filename = ''.join(i for i in self.nickname if i.isalnum()) + '-' + self.config.host + '.db'
+		self.db = pickledb(filename, True)
+
 		self.dispatcher = Dispatcher(self)
 		self.dispatcher.load_modules()
 
