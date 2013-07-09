@@ -159,7 +159,7 @@ class Dispatcher(object):
 		for priority in ('high', 'medium', 'low'):
 			items = self.commands[priority]
 			if not event in items:
-				logging.debug('No observers for {0}'.format(event))
+				logging.debug('No observers for {0}.{1}'.format(priority, event))
 				continue
 
 			for func in items.get(event):
