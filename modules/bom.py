@@ -145,6 +145,9 @@ def reload(bot, state):
 
 
 def bom(bot, input):
+	if not input.group(2):
+		return bot.reply('Please specify a location (in form Place, State)')
+
 	if input.group(2).startswith('reload') and input.admin:
 		_, state = input.group(2).split(' ')
 		return reload(bot, state)
