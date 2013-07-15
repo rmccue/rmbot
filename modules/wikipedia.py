@@ -63,8 +63,12 @@ def wplinker(bot, input):
 	term = input.groups()[0]
 
 	try:
-		result = get_page(term)
-		bot.say(u'{0}'.format(result['extract'].strip()))
+		extract = get_page(term)['extract'].strip()
+		#Follow redirects (but only the first one)
+		if extract.startswith('REDIRECT'):
+			extract = get_page('_'.join(extract.split()[1:]))['extract'].strip()
+
+		bot.say(u'{0}'.format(extract))
 
 	except NotFound:
 		bot.reply('Page does not appear to exist.')
