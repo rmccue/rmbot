@@ -27,13 +27,10 @@ def list_help(bot, input):
 	else:
 		name = input.group(2)
 		pos = name.find(bot.config.prefix)
-		logging.info(pos)
 		if pos == 0:
 			name = name[pos + 1:]
-		logging.info(name)
 		if not name in bot.dispatcher.doc:
 			for _name, info in bot.dispatcher.doc.items():
-				logging.info(_name)
 				if name in info['commands']:
 					name = _name
 				if name in bot.dispatcher.doc:
