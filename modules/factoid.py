@@ -106,18 +106,19 @@ def list_factoids(bot, input):
 list_factoids.rule = ('$nick', )
 
 
-def display(bot, input):
+def display(bot, input, fact = None):
 	if not input.sender.startswith('#'):
 		return
 
 	channel_factoids = factoids['default'].copy()
 	channel_factoids.update( factoids.setdefault( input.sender, {} ) )
-	fact = input.strip()
+	if not fact:
+		fact = input.strip()
 
 	if fact in channel_factoids:
 		verb, response = random.choice(channel_factoids[fact])
 		if verb == 'alias':
-			return display(bot, response)
+			return display(bot, input, response)
 
 		response = replace_tokens(bot, input, response)
 
