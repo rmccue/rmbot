@@ -192,9 +192,6 @@ class Dispatcher(object):
 
 	def call(self, func, origin, bot, input):
 		try:
-			if type(input) is unicode:
-				input = input.encode('utf-8')
-
 			func(bot, input)
 		except Exception:
 			self.error(origin)
