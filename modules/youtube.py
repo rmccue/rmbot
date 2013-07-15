@@ -45,7 +45,7 @@ def yt_matcher(bot, input):
 
 	bot.say(link(input.group(1)))
 yt_matcher.name = 'YouTube Autolinker'
-yt_matcher.rule = r'.*http://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+).*'
+yt_matcher.rule = r'.*https?://(?:www\.)?youtu(?:\.be/|be\.com/watch\?v=)([^&#\s]+).*'
 yt_matcher.priority = 'low'
 
 
