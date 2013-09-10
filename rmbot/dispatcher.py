@@ -184,9 +184,8 @@ class Dispatcher(object):
 					bot = self.wrapped(origin, args)
 					input = self.input(origin, text, match, event, args)
 
-					if func.thread and False:  # TODO: reenable threading here
-						targs = (func, origin, bot, input)
-						reactor.callInThread(self.call, targs)
+					if func.thread:
+						reactor.callInThread(self.call, func, origin, bot, input)
 					else:
 						self.call(func, origin, bot, input)
 
