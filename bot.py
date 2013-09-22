@@ -102,6 +102,7 @@ class rmbot(irc.IRCClient):
 
 	def msg(self, user, message, length=irc.MAX_COMMAND_LENGTH):
 		irc.IRCClient.msg(self, user, message.encode('utf-8'), length)
+                reactor.callLater(0, logging.debug, 'Control was returned to the Twisted reactor.')
 
 	def join(self, channel, key=None):
 		irc.IRCClient.join(self, channel.encode('utf-8'), key)
@@ -303,7 +304,7 @@ def main():
 	if not hasattr(config, 'port'):
 		config.port = 6667
 
-	logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+	logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO if not hasattr(config, 'loglevel') else config.loglevel)
 	observer = twistedlog.PythonLoggingObserver()
 	observer.start()
 
