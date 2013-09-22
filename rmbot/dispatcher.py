@@ -230,8 +230,8 @@ class Dispatcher(object):
 		class CommandInput(unicode):
 			def __new__(cls, text, origin, match, event, args):
 				s = unicode.__new__(cls, text)
-				s.sender = s.channel = origin.channel
-				s.nick = s.user = origin.user
+				s.sender = s.channel = origin.channel if origin else None
+				s.nick = s.user = origin.user if origin else None
 				s.event = event
 				s.match = match
 				if hasattr(match, 'group'):
@@ -241,8 +241,8 @@ class Dispatcher(object):
 					s.group = lambda x: None
 					s.groups = lambda x: ()
 				s.args = args
-				s.admin = origin.user in self.bot.config.admins
-				s.owner = origin.user == self.bot.config.owner
+				s.admin = origin.user in self.bot.config.admins if origin else False
+				s.owner = origin.user == self.bot.config.owner if origin else False
 				return s
 
 		return CommandInput(text, origin, match, event, args)
