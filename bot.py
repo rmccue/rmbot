@@ -100,7 +100,7 @@ class rmbot(irc.IRCClient):
 		irc.IRCClient.describe(self, channel, action.encode('utf-8'))
 	action = describe
 
-	def msg(self, user, message, length=None):
+	def msg(self, user, message, length=irc.MAX_COMMAND_LENGTH):
 		irc.IRCClient.msg(self, user, message.encode('utf-8'), length)
 
 	def join(self, channel, key=None):
