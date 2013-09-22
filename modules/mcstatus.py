@@ -72,7 +72,7 @@ def mcstatus_setup(bot, *args, **kwargs): # fuck if I know what params this is s
     all_up = True
     for server in results:
         laststatus[server] = results[server]['status']
-        if results[server][status] != 'up': all_up = False
+        if results[server]['status'] != 'up': all_up = False
     laststatus['all_up'] = all_up
 
     global checktask
