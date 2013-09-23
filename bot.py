@@ -13,6 +13,8 @@ import inspect
 from rmbot.dispatcher import Dispatcher
 from rmbot.pickledb import pickledb
 
+# Comment out the below import to disable debugging signal handlers
+from rmbot import debug
 
 class Origin(object):
 	user = ''
