@@ -47,7 +47,10 @@ mcstatus.commands = ['mcstatus']
 def mcstatus_check(bot):
     verbose = True
 
-    results = getstatus()
+    try:
+        results = getstatus()
+    except:
+        return
     send = u''
     all_up = True
     for server in results:
@@ -65,9 +68,12 @@ def mcstatus_check(bot):
     bot.msg('#mcau', send.strip())
 
 
-def mcstatus_setup(bot, *args, **kwargs): # fuck if I know what params this is supposed to accept --TerrorBite
+def mcstatus_setup(bot, input):
 
-    results = getstatus()
+    try:
+        results = getstatus()
+    except:
+        return # abandon and don't even start checking
     global laststatus
     all_up = True
     for server in results:
