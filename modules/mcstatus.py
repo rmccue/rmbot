@@ -85,11 +85,9 @@ def mcstatus_setup(bot, input):
     checktask = task.LoopingCall(mcstatus_check, bot)
     checktask.start(60.0)
 
-def mcstatus_teardown(bot, *args, **kwargs):
+def teardown(bot, reloading):
+	"Called when the module is being unloaded"
     checktask.stop()
 
 mcstatus_setup.event = 'signedon'
 mcstatus_setup.priority = 'low'
-mcstatus_teardown.event = 'userquit'
-mcstatus_teardown.priority = 'low'
-
