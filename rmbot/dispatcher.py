@@ -19,11 +19,14 @@ class Dispatcher(object):
 			try:
 				file, filename, data = imp.find_module(name, ['modules'])
 				module = imp.load_module(name, file, filename, data)
-			except Exception, e:
-				logging.error("Error loading %s: %s (in bot.py)" % (name, e))
+			except:
+				logging.exception('Failed to load module "%s". Details:' % (name,))
 			else:
 				if hasattr(module, 'setup'):
-					module.setup(self.bot)
+					try:
+						module.setup(self.bot, False)
+					except:
+						logging.exception('Failed to call setup() for module "%s". The module may not function correctly. Details:' % (name,))
 				self.register_module(module)
 				modules.append(name)
 				self.modules[name] = module
@@ -36,8 +39,18 @@ class Dispatcher(object):
 		self.bind_commands()
 
 	def reload_module(self, name):
-		file, filename, data = imp.find_module(name, ['modules'])
-		module = imp.load_module(name, file, filename, data)
+		if hasattr(module, 'teardown'):
+			try:
+				module.teardown(self.bot, True)
+			except:
+				logging.exception('Failed to call teardown() for module "%s". Details:' % (name,))
+
+		try:
+			file, filename, data = imp.find_module(name, ['modules'])
+			module = imp.load_module(name, file, filename, data)
+		except:
+			logging.exception('Failed to load module "%s". Details:' % (name,))
+			return None, None
 
 		if hasattr(module, '__file__'):
 			import os.path
@@ -48,7 +61,10 @@ class Dispatcher(object):
 			modified = 'unknown'
 
 		if hasattr(module, 'setup'):
-			module.setup(self.bot)
+			try:
+				module.setup(self.bot, True)
+			except:
+				logging.exception("Failed to call setup() for module %s. The module may not function correctly. See traceback below." % (name,))
 
 		self.register_module(module)
 		self.bind_commands()
@@ -208,23 +224,23 @@ class Dispatcher(object):
 			print e
 			self.bot.msg(origin.channel, "Got an error.")
 
-	def wrapped(self, origin, args):
-		class BotWrapper(object):
-			def __init__(self, bot):
-				self.bot = bot
+        def wrapped(self, origin, args):
+                class BotWrapper(object):
+                        def __init__(self, bot):
+                                self.bot = bot
 
-			def __getattr__(self, attr):
-				if attr == 'motion':
-					return (lambda msg:
-						self.bot.describe(origin.channel, msg))
-				elif attr == 'reply':
-					return (lambda msg:
-						self.bot.msg(origin.channel, origin.user + ': ' + msg))
-				elif attr == 'say':
-					return lambda msg: self.bot.msg(origin.channel, msg)
-				return getattr(self.bot, attr)
+                        def __getattr__(self, attr):
+                                if attr == 'motion':
+                                        return (lambda msg:
+                                                reactor.callFromThread(self.bot.describe, origin.channel, msg))
+                                elif attr == 'reply':
+                                        return (lambda msg:
+                                                reactor.callFromThread(self.bot.msg, origin.channel, origin.user + ': ' + msg))
+                                elif attr == 'say':
+                                        return lambda msg: reactor.callFromThread(self.bot.msg, origin.channel, msg)
+                                return getattr(self.bot, attr)
 
-		return BotWrapper(self.bot)
+                return BotWrapper(self.bot)
 
 	def input(self, origin, text, match, event, args):
 		class CommandInput(unicode):

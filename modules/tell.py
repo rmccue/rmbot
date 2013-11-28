@@ -20,7 +20,7 @@ maximum = 2
 lastrun = 0
 people = collections.defaultdict(dict)
 
-
+==
 def setup(bot):
 	bot.reminders = bot.db.get('tell.reminders')
 	if not bot.reminders:
