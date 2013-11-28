@@ -104,7 +104,7 @@ class rmbot(irc.IRCClient):
 
 	def msg(self, user, message, length=irc.MAX_COMMAND_LENGTH):
 		irc.IRCClient.msg(self, user, message.encode('utf-8'), length)
-                reactor.callLater(0, logging.debug, 'Control was returned to the Twisted reactor.')
+		reactor.callLater(0, logging.debug, 'Control was returned to the Twisted reactor.')
 
 	def join(self, channel, key=None):
 		irc.IRCClient.join(self, channel.encode('utf-8'), key)
