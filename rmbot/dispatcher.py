@@ -262,3 +262,11 @@ class Dispatcher(object):
 				return s
 
 		return CommandInput(text, origin, match, event, args)
+
+	def teardown_modules(self):
+		for name, module in self.modules.items():
+			if hasattr(module, 'teardown'):
+				try:
+					module.teardown(self.bot, True)
+				except:
+					logging.exception('Failed to call teardown() for module "%s". Details:' % (name,))

@@ -90,6 +90,7 @@ class rmbot(irc.IRCClient):
 
 	def connectionLost(self, reason):
 		irc.IRCClient.connectionLost(self, reason)
+		self.dispatcher.teardown_modules()
 
 	# Observer pattern
 
