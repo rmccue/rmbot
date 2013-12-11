@@ -68,7 +68,7 @@ def mcstatus_check(bot):
 	bot.msg('#mcau', send.strip())
 
 
-def mcstatus_setup(bot, input):
+def setup(bot, reloading):
 
 	try:
 		results = getstatus()
@@ -88,6 +88,3 @@ def mcstatus_setup(bot, input):
 def teardown(bot, reloading):
 	"Called when the module is being unloaded"
 	checktask.stop()
-
-mcstatus_setup.event = 'signedon'
-mcstatus_setup.priority = 'low'
