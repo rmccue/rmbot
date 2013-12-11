@@ -56,7 +56,7 @@ def mcstatus_check(bot):
 	for server in results:
 		s = results[server]['status']
 		if verbose:
-			if laststatus[server] != results[server]['status']:
+			if server in laststatus and laststatus[server] != results[server]['status']:
 				send += '{0} {1}. '.format(descs[server] if server in descs else server, statuses[s].format(results[server]['downtime'] if 'downtime' in results[server] else '') if s in statuses else s)
 		laststatus[server] = s
 		if s != 'up':
