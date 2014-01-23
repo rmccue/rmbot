@@ -25,6 +25,9 @@ class Dispatcher(object):
 				if hasattr(module, 'setup'):
 					try:
 						module.setup(self.bot, False)
+					except TypeError:
+						# Fallback for old setup
+						module.setup(self.bot)
 					except:
 						logging.exception('Failed to call setup() for module "%s". The module may not function correctly. Details:' % (name,))
 				self.register_module(module)
@@ -44,6 +47,9 @@ class Dispatcher(object):
 			if hasattr(module, 'teardown'):
 				try:
 					module.teardown(self.bot, True)
+				except TypeError:
+					# Fallback for old setup
+					module.setup(self.bot)
 				except:
 					logging.exception('Failed to call teardown() for module "%s". Details:' % (name,))
 		except KeyError:
@@ -68,6 +74,9 @@ class Dispatcher(object):
 		if hasattr(module, 'setup'):
 			try:
 				module.setup(self.bot, True)
+			except TypeError:
+				# Fallback for old setup
+				module.setup(self.bot)
 			except:
 				logging.exception("Failed to call setup() for module %s. The module may not function correctly. See traceback below." % (name,))
 
