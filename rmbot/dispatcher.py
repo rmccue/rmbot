@@ -39,11 +39,16 @@ class Dispatcher(object):
 		self.bind_commands()
 
 	def reload_module(self, name):
-		if hasattr(module, 'teardown'):
-			try:
-				module.teardown(self.bot, True)
-			except:
-				logging.exception('Failed to call teardown() for module "%s". Details:' % (name,))
+		try:
+			module = self.modules[name]
+			if hasattr(module, 'teardown'):
+				try:
+					module.teardown(self.bot, True)
+				except:
+					logging.exception('Failed to call teardown() for module "%s". Details:' % (name,))
+		except KeyError:
+			# Loading a module for the first time. Skipping teardown
+			pass
 
 		try:
 			file, filename, data = imp.find_module(name, ['modules'])
