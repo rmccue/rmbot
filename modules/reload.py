@@ -20,7 +20,10 @@ def f_reload(bot, input):
 
 	try:
 		module, modified = bot.dispatcher.reload_module(name)
-		bot.reply('%r (version: %s)' % (module, modified))
+		if not module:
+			bot.reply('Failed: The module could not be loaded.')
+		else:
+			bot.reply('Success: %r (version: %s)' % (module, modified))
 	except ImportError:
 		return bot.reply('Module not found')
 f_reload.name = 'reload'
